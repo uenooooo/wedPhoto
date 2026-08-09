@@ -55,7 +55,7 @@ h2 { font-size: 28px; margin: 5px 0; }
 .info-overlay { position: fixed; inset: 0; z-index: 11; display: grid; place-items: center; padding: 24px; background: rgba(31, 24, 23, .5); }
 .info-dialog { position: relative; width: min(100%, 480px); padding: 34px; border-radius: 22px; background: #fffdfb; box-shadow: 0 20px 80px rgba(0,0,0,.25); }
 .info-dialog h2 { margin-top: 5px; }.info-dialog p { line-height: 1.8; }.info-dialog a { color: #8a5e59; font-weight: 700; }
-.github-link { margin-top: 26px; font-size: 13px; }
+.github-link { display: flex; flex-direction: column; gap: 5px; margin-top: 28px; padding-top: 18px; border-top: 1px solid #eee1dd; font-size: 13px; }.github-link span { color: #81736f; font-weight: 700; }
 .info-close { position: absolute; top: 14px; right: 14px; border: 0; background: transparent; color: #4e3a37; font-size: 28px; cursor: pointer; }
 .upload-list { margin: 16px 0 0; padding: 0; list-style: none; }
 .upload-list li { padding: 10px 0; border-bottom: 1px solid #eee5e2; }
