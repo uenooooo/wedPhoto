@@ -33,6 +33,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
   const [selected, setSelected] = useState<string[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
   const [viewing, setViewing] = useState<Media | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
   const [uploads, setUploads] = useState<UploadState[]>([]);
   const [archiveStatus, setArchiveStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -130,7 +131,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
       <p className="eyebrow">Wedding memories</p>
       <h1>Sota & Momoka&apos;s<br />Wedding Photo Gallery</h1>
       <p className="lead">結婚式用の写真や動画の共有サイトです。</p>
-      <label className="button">写真・動画を追加<input hidden type="file" accept="image/*,video/*" multiple onChange={onChoose} /></label>
+      <div className="hero-actions"><label className="button">写真・動画を追加<input hidden type="file" accept="image/*,video/*" multiple onChange={onChoose} /></label><button className="info-button" onClick={() => setShowInfo(true)}>i&nbsp;&nbsp;Info</button></div>
     </header>
 
     {uploads.length > 0 && <section className="section"><h2>アップロード</h2><ul className="upload-list">{uploads.map((item) => <li key={item.id}><strong>{item.name}</strong><br /><small>{item.status === "uploading" ? `${Math.round(item.progress * 100)}% アップロード中` : item.status === "processing" ? "変換を準備中" : item.error}</small>{item.status === "uploading" && <progress className="progress" value={item.progress} max="1" />}</li>)}</ul></section>}
@@ -142,5 +143,6 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
       {loading ? <p className="empty">読み込み中…</p> : visibleItems.length === 0 ? <p className="empty">まだ写真・動画はありません。</p> : <div className="grid">{visibleItems.map((item) => <button className={`card ${isSelecting && selected.includes(item.key) ? "selected" : ""}`} key={item.key} onClick={() => isSelecting ? toggle(item.key) : setViewing(item)}>{item.type === "image" ? <img src={item.url} alt="結婚式の投稿写真" /> : <><video src={item.url} preload="metadata" muted /><span className="video-badge">VIDEO</span></>}</button>)}</div>}
     </section>
     {viewing && <div className="viewer" role="dialog" aria-modal="true" aria-label="メディアを拡大表示" onClick={() => setViewing(null)}><button className="viewer-close" aria-label="閉じる">×</button>{viewerIndex > 0 && <button className="viewer-nav previous" aria-label="前のメディア" onClick={(event) => { event.stopPropagation(); moveViewer(-1); }}>‹</button>}<div className="viewer-content" onClick={(event) => event.stopPropagation()}>{viewing.type === "image" ? <img src={viewing.url} alt="結婚式の投稿写真" /> : <video src={viewing.url} controls autoPlay />}</div>{viewerIndex < visibleItems.length - 1 && <button className="viewer-nav next" aria-label="次のメディア" onClick={(event) => { event.stopPropagation(); moveViewer(1); }}>›</button>}<p className="viewer-count">{viewerIndex + 1} / {visibleItems.length}</p></div>}
+    {showInfo && <div className="info-overlay" role="dialog" aria-modal="true" aria-label="ご案内" onClick={() => setShowInfo(false)}><section className="info-dialog" onClick={(event) => event.stopPropagation()}><button className="info-close" aria-label="閉じる" onClick={() => setShowInfo(false)}>×</button><p className="eyebrow">Information</p><h2>ご案内</h2><p>画像と動画のご投稿をお願いします。</p><p>お気づきやお問い合わせは以下までお願いします。</p><a href="mailto:sota304560@gmail.com">sota304560@gmail.com</a></section></div>}
   </main>;
 }

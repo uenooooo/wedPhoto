@@ -14,6 +14,8 @@ h2 { font-size: 28px; margin: 5px 0; }
 .hero .button { display: inline-flex; align-items: center; gap: 9px; min-height: 52px; padding: 14px 22px; background: white; color: #4e3a37; box-shadow: 0 8px 20px rgba(44, 29, 27, .25); font-weight: 700; transition: transform .2s ease, box-shadow .2s ease; }
 .hero .button::before { content: "+"; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: white; background: #9d7771; font-size: 18px; font-weight: 400; }
 .hero .button:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(44, 29, 27, .32); }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.info-button { min-height: 52px; padding: 12px 18px; border: 1px solid rgba(255,255,255,.55); border-radius: 999px; color: white; background: transparent; cursor: pointer; }
 .lead { color: #766d6a; margin: 0 0 28px; }
 .actions, .toolbar, .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .button { border: 0; border-radius: 999px; padding: 12px 18px; background: #4e3a37; color: white; cursor: pointer; }
@@ -38,6 +40,10 @@ h2 { font-size: 28px; margin: 5px 0; }
 .viewer-close { position: fixed; top: 18px; right: 18px; width: 42px; height: 42px; border: 0; border-radius: 50%; background: white; color: #4e3a37; font-size: 28px; cursor: pointer; }
 .viewer-nav { position: fixed; top: 50%; z-index: 1; width: 52px; height: 52px; border: 0; border-radius: 50%; color: #4e3a37; background: white; font-size: 42px; line-height: 1; cursor: pointer; transform: translateY(-50%); }
 .viewer-nav.previous { left: 18px; }.viewer-nav.next { right: 18px; }.viewer-count { position: fixed; bottom: 10px; color: white; }
+.info-overlay { position: fixed; inset: 0; z-index: 11; display: grid; place-items: center; padding: 24px; background: rgba(31, 24, 23, .5); }
+.info-dialog { position: relative; width: min(100%, 480px); padding: 34px; border-radius: 22px; background: #fffdfb; box-shadow: 0 20px 80px rgba(0,0,0,.25); }
+.info-dialog h2 { margin-top: 5px; }.info-dialog p { line-height: 1.8; }.info-dialog a { color: #8a5e59; font-weight: 700; }
+.info-close { position: absolute; top: 14px; right: 14px; border: 0; background: transparent; color: #4e3a37; font-size: 28px; cursor: pointer; }
 .upload-list { margin: 16px 0 0; padding: 0; list-style: none; }
 .upload-list li { padding: 10px 0; border-bottom: 1px solid #eee5e2; }
 .progress { width: 100%; margin-top: 6px; accent-color: #9d7771; }
