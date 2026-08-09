@@ -129,7 +129,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
     <header className="hero">
       <p className="eyebrow">Wedding memories</p>
       <h1>Sota & Momoka&apos;s<br />Wedding Photo Gallery</h1>
-      <p className="lead">写真と動画を、みんなで残そう。</p>
+      <p className="lead">結婚式用の写真や動画の共有サイトです。</p>
       <label className="button">写真・動画を追加<input hidden type="file" accept="image/*,video/*" multiple onChange={onChoose} /></label>
     </header>
 
