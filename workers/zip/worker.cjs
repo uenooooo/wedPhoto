@@ -13,11 +13,12 @@ const archive = archiver("zip", { zlib: { level: 0 } }); // JPEG/MP4は再圧縮
 const upload = new Upload({ client, params: { Bucket: bucket, Key: archiveKey, Body: archive, ContentType: "application/zip" } });
 
 (async () => {
+  const uploadDone = upload.done();
   for (const key of mediaKeys) {
     if (typeof key !== "string" || !key.startsWith("ready/")) throw new Error("Invalid media key.");
     const object = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
     archive.append(object.Body, { name: path.basename(key) });
   }
   await archive.finalize();
-  await upload.done();
+  await uploadDone;
 })().catch((error) => { console.error(error); process.exitCode = 1; });

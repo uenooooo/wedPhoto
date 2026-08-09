@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "選択ファイルが不正です。" }, { status: 400 });
   }
   const cluster = process.env.ZIP_CLUSTER_ARN;
-  const taskDefinition = process.env.ZIP_TASK_DEFINITION_ARN;
+  const taskDefinition = process.env.ZIP_TASK_DEFINITION_ARN?.replace(/:\d+$/, "");
   const subnets = process.env.ZIP_SUBNET_IDS?.split(",").filter(Boolean);
   const securityGroups = process.env.ZIP_SECURITY_GROUP_IDS?.split(",").filter(Boolean);
   if (!cluster || !taskDefinition || !subnets?.length || !securityGroups?.length) {
