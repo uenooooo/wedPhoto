@@ -5,5 +5,5 @@ export default function Home() {
   if (eventKey) {
     return <Gallery eventKey={eventKey} />;
   }
-  return <main className="landing"><h1>Weddind Photo System</h1><p>.env.local に EVENT_KEY を設定してください。</p></main>;
+  return <main className="landing"><h1>Sota & Momoka&apos;s Wedding Photo Gallery</h1><p>.env.local に EVENT_KEY を設定してください。</p></main>;
 }

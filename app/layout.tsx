@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Weddind Photo System for Sota and Momoka",
+  title: "Sota & Momoka's Wedding Photo Gallery",
   description: "結婚式の写真・動画共有ページ",
 };
 

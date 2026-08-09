@@ -1,4 +1,4 @@
-# Weddind Photo System for Sota and Momoka
+# Sota & Momoka's Wedding Photo Gallery
 
 ## 目的
 
@@ -15,7 +15,7 @@
 - 写真は拡大表示、動画はページ内再生、各ファイルは個別ダウンロード可能にする。
 - ギャラリーで複数選択できる。20件未満は個別ダウンロード、20件以上はZIPで一括ダウンロードする。20件は、一般的な回線で5MB程度の写真を約30秒で取得できる目安とする。
 - 「すべてをダウンロード」はZIPで一括ダウンロードする。
-- 表示名は `Weddind Photo System for Sota and Momoka`。
+- 表示名は `Sota & Momoka's Wedding Photo Gallery`。
 - 日本語、白基調のシンプルで上品なデザイン。スマホ優先・PC対応のレスポンシブUI。
 - 保存期限・動画時間・アプリ上のファイルサイズ制限は設けない。S3の整理は必要時に手動で行う。
 
