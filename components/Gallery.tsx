@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, TouchEvent, useEffect, useMemo, useState } from "react";
+import JSZip from "jszip";
 
 type Media = { key: string; type: "image" | "video"; createdAt: string; url: string };
 type UploadState = { id: string; name: string; progress: number; status: "uploading" | "error"; error?: string };
@@ -37,6 +38,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [uploads, setUploads] = useState<UploadState[]>([]);
   const [archiveStatus, setArchiveStatus] = useState<string | null>(null);
+  const [isPreparingArchive, setIsPreparingArchive] = useState(false);
   const [loading, setLoading] = useState(true);
   const visibleItems = useMemo(() => filter === "all" ? items : items.filter((item) => item.type === filter), [items, filter]);
   const viewerIndex = viewing ? visibleItems.findIndex((item) => item.key === viewing.key) : -1;
@@ -102,6 +104,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
     link.remove();
   };
   const requestArchive = async (keys: string[]) => {
+    setIsPreparingArchive(true);
     setArchiveStatus("ZIPを準備中です…");
     try {
       const response = await fetch("/api/archives", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ eventKey, keys }) });
@@ -112,6 +115,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
         const status = await statusResponse.json();
         if (status.status === "ready") {
           setArchiveStatus("ZIPの準備ができました。");
+          setIsPreparingArchive(false);
           download(status.key);
           return;
         }
@@ -119,12 +123,39 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
       };
       window.setTimeout(check, 3000);
     } catch (error) {
+      setIsPreparingArchive(false);
       setArchiveStatus(error instanceof Error ? error.message : "ZIPを作成できませんでした。");
+    }
+  };
+  const createZipInBrowser = async (selectedItems: Media[]) => {
+    setIsPreparingArchive(true);
+    setArchiveStatus("ZIPを作成中です…");
+    try {
+      const zip = new JSZip();
+      await Promise.all(selectedItems.map(async (item) => {
+        const response = await fetch(item.url);
+        if (!response.ok) throw new Error("写真を読み込めませんでした。");
+        zip.file(item.key.split("/").pop() ?? "photo.jpg", await response.blob());
+      }));
+      const blob = await zip.generateAsync({ type: "blob", compression: "STORE" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "wedding-photos.zip";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      setArchiveStatus(null);
+    } catch (error) {
+      setArchiveStatus(error instanceof Error ? error.message : "ZIPを作成できませんでした。");
+    } finally {
+      setIsPreparingArchive(false);
     }
   };
   const downloadSelected = () => {
     const selectedItems = items.filter((item) => selected.includes(item.key));
-    if (selectedItems.length >= 2) void requestArchive(selectedItems.map((item) => item.key));
+    if (selectedItems.length >= 2 && selectedItems.length <= 5 && selectedItems.every((item) => item.type === "image")) void createZipInBrowser(selectedItems);
+    else if (selectedItems.length >= 2) void requestArchive(selectedItems.map((item) => item.key));
     else selectedItems.forEach((item) => download(item.key));
   };
   const selectedCount = selected.length;
@@ -157,8 +188,8 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
       <div className="filters">{filters.map((value) => <button key={value} className={`filter ${filter === value ? "active" : ""}`} onClick={() => setFilter(value)}>{labels[value]}</button>)}</div>
       {loading ? <p className="empty">読み込み中…</p> : visibleItems.length === 0 ? <p className="empty">まだ写真・動画はありません。</p> : <div className="grid">{visibleItems.map((item) => <button className={`card ${isSelecting && selected.includes(item.key) ? "selected" : ""}`} key={item.key} onClick={() => isSelecting ? toggle(item.key) : setViewing(item)}>{item.type === "image" ? <img src={item.url} alt="結婚式の投稿写真" /> : <><video src={item.url} preload="metadata" muted /><span className="video-badge">VIDEO</span></>}</button>)}</div>}
     </section>
-    {isSelecting && <div className="selection-actionbar"><button className="button" disabled={selectedCount === 0 || archiveStatus === "ZIPを準備中です…"} onClick={downloadSelected}>{archiveStatus === "ZIPを準備中です…" ? "ZIPを準備中…" : selectedCount >= 2 ? "ZIPを作成してダウンロード" : "ダウンロード"}</button></div>}
-    {archiveStatus === "ZIPを準備中です…" && <div className="archive-overlay" role="status" aria-live="polite"><div className="archive-dialog"><span className="archive-spinner" /><strong>ZIPを準備中です</strong><p>通常は30秒〜1分です。<br />動画や大量の写真は数分かかる場合があります。</p><small>準備ができ次第、自動でダウンロードします。<br />この画面を閉じずにお待ちください。</small></div></div>}
+    {isSelecting && <div className="selection-actionbar"><button className="button" disabled={selectedCount === 0 || isPreparingArchive} onClick={downloadSelected}>{isPreparingArchive ? "ZIPを準備中…" : selectedCount >= 2 ? "ZIPを作成してダウンロード" : "ダウンロード"}</button></div>}
+    {isPreparingArchive && <div className="archive-overlay" role="status" aria-live="polite"><div className="archive-dialog"><span className="archive-spinner" /><strong>ZIPを準備中です</strong><p>{selectedCount <= 5 && items.filter((item) => selected.includes(item.key)).every((item) => item.type === "image") ? "通常は数秒で完了します。" : "通常は30秒〜1分です。\n動画や大量の写真は数分かかる場合があります。"}</p><small>準備ができ次第、自動でダウンロードします。<br />この画面を閉じずにお待ちください。</small></div></div>}
     {viewing && <div className="viewer" role="dialog" aria-modal="true" aria-label="メディアを拡大表示" onClick={() => setViewing(null)} onTouchStart={(event) => setTouchStartX(event.touches[0].clientX)} onTouchEnd={finishSwipe}><button className="viewer-close" aria-label="閉じる">×</button>{viewerIndex > 0 && <button className="viewer-nav previous" aria-label="前のメディア" onClick={(event) => { event.stopPropagation(); moveViewer(-1); }}>‹</button>}<div className="viewer-content" onClick={(event) => event.stopPropagation()}>{viewing.type === "image" ? <img src={viewing.url} alt="結婚式の投稿写真" /> : <video src={viewing.url} controls autoPlay />}</div>{viewerIndex < visibleItems.length - 1 && <button className="viewer-nav next" aria-label="次のメディア" onClick={(event) => { event.stopPropagation(); moveViewer(1); }}>›</button>}<p className="viewer-count">{viewerIndex + 1} / {visibleItems.length}</p></div>}
     {showInfo && <div className="info-overlay" role="dialog" aria-modal="true" aria-label="ご案内" onClick={() => setShowInfo(false)}><section className="info-dialog" onClick={(event) => event.stopPropagation()}><button className="info-close" aria-label="閉じる" onClick={() => setShowInfo(false)}>×</button><p className="eyebrow">Information</p><h2>お問い合わせ</h2><p>お気づきやお問い合わせは以下までお願いします。</p><a href="mailto:sota304560@gmail.com">sota304560@gmail.com</a><div className="github-link"><span>github:</span><a href="https://github.com/uenooooo/wedPhoto" target="_blank" rel="noreferrer">https://github.com/uenooooo/wedPhoto</a></div></section></div>}
   </main>;
