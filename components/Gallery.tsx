@@ -136,7 +136,6 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
 
   return <main className={`page ${isSelecting ? "selecting" : ""}`}>
     <header className="hero">
-      <p className="eyebrow">Wedding memories</p>
       <h1>Sota & Momoka&apos;s<br />Wedding Photo Gallery</h1>
       <p className="lead">結婚式用の写真や動画の共有サイトです。</p>
       <p className="hero-note">画像と動画のご投稿をお願いします。<br />ダウンロードも可能です。</p>
