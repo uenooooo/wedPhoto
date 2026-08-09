@@ -11,6 +11,9 @@ h1 { font-size: clamp(30px, 6vw, 56px); margin: 8px 0; }
 h2 { font-size: 28px; margin: 5px 0; }
 .hero { padding: clamp(34px, 8vw, 84px); border-radius: 26px; color: #fffaf8; background: radial-gradient(circle at 83% 18%, #c99e94 0, #9a706b 24%, transparent 52%), linear-gradient(135deg, #4d3938, #7d5c58); box-shadow: 0 20px 50px rgba(73, 48, 45, .19); }
 .hero .lead { color: #f1ded9; }
+.hero .button { display: inline-flex; align-items: center; gap: 9px; min-height: 52px; padding: 14px 22px; background: white; color: #4e3a37; box-shadow: 0 8px 20px rgba(44, 29, 27, .25); font-weight: 700; transition: transform .2s ease, box-shadow .2s ease; }
+.hero .button::before { content: "+"; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: white; background: #9d7771; font-size: 18px; font-weight: 400; }
+.hero .button:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(44, 29, 27, .32); }
 .lead { color: #766d6a; margin: 0 0 28px; }
 .actions, .toolbar, .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .button { border: 0; border-radius: 999px; padding: 12px 18px; background: #4e3a37; color: white; cursor: pointer; }
