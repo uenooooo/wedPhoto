@@ -3,7 +3,7 @@
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 
 type Media = { key: string; type: "image" | "video"; createdAt: string; url: string };
-type UploadState = { id: string; name: string; progress: number; status: "uploading" | "processing" | "error"; error?: string };
+type UploadState = { id: string; name: string; progress: number; status: "uploading" | "error"; error?: string };
 const filters = ["all", "image", "video"] as const;
 const labels = { all: "すべて", image: "写真", video: "動画" };
 
@@ -80,7 +80,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
         parts.push({ ETag: etag, PartNumber: partNumber });
       }
       await api({ action: "complete", eventKey, key: started.key, uploadId: started.uploadId, parts, name: file.name, type: file.type });
-      setUploads((current) => current.map((item) => item.id === id ? { ...item, progress: 1, status: "processing" } : item));
+      setUploads((current) => current.filter((item) => item.id !== id));
     } catch (error) {
       setUploads((current) => current.map((item) => item.id === id ? { ...item, status: "error", error: error instanceof Error ? error.message : "失敗しました。" } : item));
     }
@@ -134,7 +134,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
       <div className="hero-actions"><label className="button">写真・動画を追加<input hidden type="file" accept="image/*,video/*" multiple onChange={onChoose} /></label><button className="info-button" onClick={() => setShowInfo(true)}>i&nbsp;&nbsp;Info</button></div>
     </header>
 
-    {uploads.length > 0 && <section className="section"><h2>アップロード</h2><ul className="upload-list">{uploads.map((item) => <li key={item.id}><strong>{item.name}</strong><br /><small>{item.status === "uploading" ? `${Math.round(item.progress * 100)}% アップロード中` : item.status === "processing" ? "変換を準備中" : item.error}</small>{item.status === "uploading" && <progress className="progress" value={item.progress} max="1" />}</li>)}</ul></section>}
+    {uploads.length > 0 && <section className="section"><h2>アップロード</h2><ul className="upload-list">{uploads.map((item) => <li key={item.id}><strong>{item.name}</strong><br /><small>{item.status === "uploading" ? `${Math.round(item.progress * 100)}% アップロード中` : item.error}</small>{item.status === "uploading" && <progress className="progress" value={item.progress} max="1" />}</li>)}</ul></section>}
 
     <section className="section gallery-section">
       <div className="toolbar"><div><p className="eyebrow">Memories</p><h2>ギャラリー</h2></div><div className="actions">{isSelecting ? <><span className="selection-count">{selectedCount}件を選択中</span><button className="button subtle" onClick={finishSelecting}>選択を終了</button>{selectedCount > 0 && <button className="button" onClick={downloadSelected}>{selectedCount >= 20 ? `${selectedCount}件をZIPでダウンロード` : `${selectedCount}件をダウンロード`}</button>}<button className="button subtle" onClick={() => void requestArchive(items.map((item) => item.key))} disabled={items.length === 0}>すべてをダウンロード</button></> : <button className="button subtle" onClick={() => setIsSelecting(true)}>選択</button>}</div></div>
