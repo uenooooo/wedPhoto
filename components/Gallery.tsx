@@ -31,6 +31,8 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
   const [items, setItems] = useState<Media[]>([]);
   const [filter, setFilter] = useState<(typeof filters)[number]>("all");
   const [selected, setSelected] = useState<string[]>([]);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [viewing, setViewing] = useState<Media | null>(null);
   const [uploads, setUploads] = useState<UploadState[]>([]);
   const [archiveStatus, setArchiveStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -105,6 +107,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
     else selectedItems.forEach((item) => download(item.url));
   };
   const selectedCount = selected.length;
+  const finishSelecting = () => { setIsSelecting(false); setSelected([]); };
 
   return <main className="page">
     <header>
@@ -117,10 +120,11 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
     {uploads.length > 0 && <section className="section"><h2>アップロード</h2><ul className="upload-list">{uploads.map((item) => <li key={item.id}><strong>{item.name}</strong><br /><small>{item.status === "uploading" ? `${Math.round(item.progress * 100)}% アップロード中` : item.status === "processing" ? "変換を準備中" : item.error}</small>{item.status === "uploading" && <progress className="progress" value={item.progress} max="1" />}</li>)}</ul></section>}
 
     <section className="section">
-      <div className="toolbar"><h2>ギャラリー</h2><div className="actions">{selectedCount > 0 && <button className="button subtle" onClick={downloadSelected}>{selectedCount >= 20 ? `${selectedCount}件をZIPでダウンロード` : `${selectedCount}件をダウンロード`}</button>}<button className="button subtle" onClick={() => void requestArchive(items.map((item) => item.key))} disabled={items.length === 0}>すべてをダウンロード</button></div></div>
+      <div className="toolbar"><h2>ギャラリー</h2><div className="actions">{isSelecting ? <><button className="button subtle" onClick={finishSelecting}>選択を終了</button>{selectedCount > 0 && <button className="button subtle" onClick={downloadSelected}>{selectedCount >= 20 ? `${selectedCount}件をZIPでダウンロード` : `${selectedCount}件をダウンロード`}</button>}<button className="button subtle" onClick={() => void requestArchive(items.map((item) => item.key))} disabled={items.length === 0}>すべてをダウンロード</button></> : <button className="button subtle" onClick={() => setIsSelecting(true)}>選択</button>}</div></div>
       {archiveStatus && <p aria-live="polite">{archiveStatus}</p>}
       <div className="filters">{filters.map((value) => <button key={value} className={`filter ${filter === value ? "active" : ""}`} onClick={() => setFilter(value)}>{labels[value]}</button>)}</div>
-      {loading ? <p className="empty">読み込み中…</p> : visibleItems.length === 0 ? <p className="empty">まだ写真・動画はありません。</p> : <div className="grid">{visibleItems.map((item) => <article className="card" key={item.key}>{item.type === "image" ? <img src={item.url} alt="結婚式の投稿写真" /> : <video src={item.url} controls preload="metadata" />}<input className="check" type="checkbox" aria-label="選択" checked={selected.includes(item.key)} onChange={() => toggle(item.key)} /><button className="download" onClick={() => download(item.url)}>↓</button></article>)}</div>}
+      {loading ? <p className="empty">読み込み中…</p> : visibleItems.length === 0 ? <p className="empty">まだ写真・動画はありません。</p> : <div className="grid">{visibleItems.map((item) => <button className={`card ${isSelecting && selected.includes(item.key) ? "selected" : ""}`} key={item.key} onClick={() => isSelecting ? toggle(item.key) : setViewing(item)}>{item.type === "image" ? <img src={item.url} alt="結婚式の投稿写真" /> : <video src={item.url} preload="metadata" muted />}</button>)}</div>}
     </section>
+    {viewing && <div className="viewer" role="dialog" aria-modal="true" aria-label="メディアを拡大表示" onClick={() => setViewing(null)}><button className="viewer-close" aria-label="閉じる">×</button><div className="viewer-content" onClick={(event) => event.stopPropagation()}>{viewing.type === "image" ? <img src={viewing.url} alt="結婚式の投稿写真" /> : <video src={viewing.url} controls autoPlay />}</div></div>}
   </main>;
 }

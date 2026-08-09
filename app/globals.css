@@ -17,10 +17,13 @@ h1 { font-family: Georgia, serif; font-size: clamp(30px, 6vw, 56px); font-weight
 .filter { border: 1px solid #e8deda; border-radius: 999px; padding: 8px 12px; background: white; cursor: pointer; }
 .filter.active { background: #f2e8e5; border-color: #d6bdb7; }
 .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.card { aspect-ratio: 1; position: relative; overflow: hidden; border-radius: 12px; background: #eee7e4; }
+.card { aspect-ratio: 1; position: relative; overflow: hidden; border: 0; border-radius: 12px; padding: 0; background: #eee7e4; cursor: pointer; }
 .card img, .card video { width: 100%; height: 100%; object-fit: cover; display: block; }
-.check { position: absolute; top: 10px; left: 10px; width: 22px; height: 22px; accent-color: #4e3a37; }
-.download { position: absolute; right: 8px; bottom: 8px; padding: 7px 9px; border: 0; border-radius: 8px; color: #4e3a37; background: rgba(255,255,255,.9); }
+.card.selected { outline: 4px solid #9d7771; outline-offset: -4px; }
+.viewer { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 24px; background: rgba(31, 24, 23, .85); }
+.viewer-content { max-width: min(100%, 1100px); max-height: 100%; }
+.viewer-content img, .viewer-content video { display: block; max-width: 100%; max-height: calc(100vh - 48px); object-fit: contain; }
+.viewer-close { position: fixed; top: 18px; right: 18px; width: 42px; height: 42px; border: 0; border-radius: 50%; background: white; color: #4e3a37; font-size: 28px; cursor: pointer; }
 .upload-list { margin: 16px 0 0; padding: 0; list-style: none; }
 .upload-list li { padding: 10px 0; border-bottom: 1px solid #eee5e2; }
 .progress { width: 100%; margin-top: 6px; accent-color: #9d7771; }
