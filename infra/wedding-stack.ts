@@ -38,7 +38,8 @@ export class WeddingStack extends cdk.Stack {
     processor.addToRolePolicy(new iam.PolicyStatement({ actions: ["iam:PassRole"], resources: [convertRole.roleArn] }));
     media.addEventNotification(s3.EventType.OBJECT_CREATED, new s3n.LambdaDestination(processor), { prefix: "uploads/" });
 
-    const vpc = new ecs.Cluster(this, "ZipCluster", { vpc: new ec2.Vpc(this, "ZipVpc", { maxAzs: 2, natGateways: 0 }) });
+    const zipVpc = new ec2.Vpc(this, "ZipVpc", { maxAzs: 2, natGateways: 0 });
+    const vpc = new ecs.Cluster(this, "ZipCluster", { vpc: zipVpc });
     const task = new ecs.FargateTaskDefinition(this, "ZipTask", { cpu: 1024, memoryLimitMiB: 2048 });
     const zipImage = new ecrAssets.DockerImageAsset(this, "ZipImage", { directory: "workers/zip" });
     task.addContainer("zip-worker", { image: ecs.ContainerImage.fromDockerImageAsset(zipImage), logging: ecs.LogDrivers.awsLogs({ streamPrefix: "zip" }) });
@@ -55,7 +56,7 @@ export class WeddingStack extends cdk.Stack {
     new cdk.CfnOutput(this, "VercelUserName", { value: appUser.userName });
     new cdk.CfnOutput(this, "ZipClusterArn", { value: vpc.clusterArn });
     new cdk.CfnOutput(this, "ZipTaskDefinitionArn", { value: task.taskDefinitionArn });
-    new cdk.CfnOutput(this, "ZipSecurityGroupId", { value: vpc.vpc.vpcDefaultSecurityGroup });
-    new cdk.CfnOutput(this, "ZipSubnetIds", { value: vpc.vpc.publicSubnets.map((subnet) => subnet.subnetId).join(",") });
+    new cdk.CfnOutput(this, "ZipSecurityGroupId", { value: zipVpc.vpcDefaultSecurityGroup });
+    new cdk.CfnOutput(this, "ZipSubnetIds", { value: zipVpc.publicSubnets.map((subnet) => subnet.subnetId).join(",") });
   }
 }
