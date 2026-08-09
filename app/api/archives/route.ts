@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
   const archiveKey = `archives/${id}.zip`;
   try {
     const ecs = new ECSClient({ region: process.env.AWS_REGION ?? "ap-northeast-1" });
-    await ecs.send(new RunTaskCommand({
+    const task = await ecs.send(new RunTaskCommand({
       cluster,
       taskDefinition,
       launchType: "FARGATE",
@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
         { name: "MEDIA_KEYS", value: JSON.stringify(body.keys) },
       ] }] },
     }));
+    if (task.failures?.length) throw new Error(task.failures.map((failure) => failure.reason).join(", "));
     return NextResponse.json({ id });
   } catch (error) {
     console.error(error);
