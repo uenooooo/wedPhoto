@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, TouchEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
 
 type Media = { key: string; type: "image" | "video"; createdAt: string; url: string };
 type UploadState = { id: string; name: string; progress: number; status: "uploading" | "error"; error?: string };
@@ -38,6 +38,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
   const [uploads, setUploads] = useState<UploadState[]>([]);
   const [archiveStatus, setArchiveStatus] = useState<string | null>(null);
   const [isPreparingArchive, setIsPreparingArchive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const visibleItems = useMemo(() => filter === "all" ? items : items.filter((item) => item.type === filter), [items, filter]);
   const viewerIndex = viewing ? visibleItems.findIndex((item) => item.key === viewing.key) : -1;
@@ -83,6 +84,8 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
       }
       await api({ action: "complete", eventKey, key: started.key, uploadId: started.uploadId, parts, name: file.name, type: file.type });
       setUploads((current) => current.filter((item) => item.id !== id));
+      void load();
+      window.setTimeout(() => void load(), 15000);
     } catch (error) {
       setUploads((current) => current.map((item) => item.id === id ? { ...item, status: "error", error: error instanceof Error ? error.message : "失敗しました。" } : item));
     }
@@ -150,13 +153,13 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
       <h1>Sota & Momoka&apos;s<br />Wedding Photo Gallery</h1>
       <p className="lead">結婚式用の写真や動画の共有サイトです。</p>
       <p className="hero-note">画像と動画のご投稿をお願いします。<br />ダウンロードも可能です。</p>
-      <button className="info-button" aria-label="サイトのご案内" onClick={() => setShowInfo(true)}>i</button><div className="hero-actions"><label className="button">写真・動画を追加<input hidden type="file" accept="image/*,video/*" multiple onChange={onChoose} /></label></div>
+      <button className="info-button" aria-label="サイトのご案内" onClick={() => setShowInfo(true)}>i</button><div className="hero-actions"><button className="button" type="button" onClick={() => fileInputRef.current?.click()}>写真・動画を追加</button><input ref={fileInputRef} hidden type="file" accept="image/*,video/*" multiple onChange={onChoose} /></div>
     </header>
 
     {uploads.length > 0 && <section className="section"><h2>アップロード</h2><ul className="upload-list">{uploads.map((item) => <li key={item.id}><strong>{item.name}</strong><br /><small>{item.status === "uploading" ? `${Math.round(item.progress * 100)}% アップロード中` : item.error}</small>{item.status === "uploading" && <progress className="progress" value={item.progress} max="1" />}</li>)}</ul></section>}
 
     <section className="section gallery-section">
-      {isSelecting ? <div className="selection-toolbar"><button onClick={finishSelecting}>キャンセル</button><strong>{selectedCount}件を選択</strong><button onClick={selectAll}>{selectedCount === visibleItems.length ? "選択解除" : "すべて選択"}</button></div> : <div className="toolbar gallery-toolbar"><h2>ギャラリー</h2><button className="button subtle" onClick={() => setIsSelecting(true)}>選択</button></div>}
+      {isSelecting ? <div className="selection-toolbar"><button onClick={finishSelecting}>キャンセル</button><strong>{selectedCount}件を選択</strong><button onClick={selectAll}>{selectedCount === visibleItems.length ? "選択解除" : "すべて選択"}</button></div> : <div className="toolbar gallery-toolbar"><h2>ギャラリー</h2><div className="gallery-actions"><button className="refresh-button" onClick={() => void load()} disabled={loading}>{loading ? "更新中…" : "更新"}</button><button className="button subtle" onClick={() => setIsSelecting(true)}>選択</button></div></div>}
       {archiveStatus && <p aria-live="polite">{archiveStatus}</p>}
       <div className="filters">{filters.map((value) => <button key={value} className={`filter ${filter === value ? "active" : ""}`} onClick={() => setFilter(value)}>{labels[value]}</button>)}</div>
       {loading ? <p className="empty">読み込み中…</p> : visibleItems.length === 0 ? <p className="empty">まだ写真・動画はありません。</p> : <div className="grid">{visibleItems.map((item) => <button className={`card ${isSelecting && selected.includes(item.key) ? "selected" : ""}`} key={item.key} onClick={() => isSelecting ? toggle(item.key) : setViewing(item)}>{item.type === "image" ? <img src={item.url} alt="結婚式の投稿写真" /> : <><video src={item.url} preload="metadata" muted /><span className="video-badge">VIDEO</span></>}</button>)}</div>}
