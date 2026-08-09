@@ -132,6 +132,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
       <p className="eyebrow">Wedding memories</p>
       <h1>Sota & Momoka&apos;s<br />Wedding Photo Gallery</h1>
       <p className="lead">結婚式用の写真や動画の共有サイトです。</p>
+      <p className="hero-note">画像と動画のご投稿をお願いします。<br />ダウンロードも可能です。</p>
       <div className="hero-actions"><label className="button">写真・動画を追加<input hidden type="file" accept="image/*,video/*" multiple onChange={onChoose} /></label></div><button className="info-button" aria-label="サイトのご案内" onClick={() => setShowInfo(true)}>i</button>
     </header>
 
@@ -145,6 +146,6 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
     </section>
     {isSelecting && <div className="selection-actionbar"><button className="button" disabled={selectedCount === 0} onClick={downloadSelected}>{selectedCount >= 20 ? "ZIPを作成してダウンロード" : "選択した写真・動画をダウンロード"}</button></div>}
     {viewing && <div className="viewer" role="dialog" aria-modal="true" aria-label="メディアを拡大表示" onClick={() => setViewing(null)}><button className="viewer-close" aria-label="閉じる">×</button>{viewerIndex > 0 && <button className="viewer-nav previous" aria-label="前のメディア" onClick={(event) => { event.stopPropagation(); moveViewer(-1); }}>‹</button>}<div className="viewer-content" onClick={(event) => event.stopPropagation()}>{viewing.type === "image" ? <img src={viewing.url} alt="結婚式の投稿写真" /> : <video src={viewing.url} controls autoPlay />}</div>{viewerIndex < visibleItems.length - 1 && <button className="viewer-nav next" aria-label="次のメディア" onClick={(event) => { event.stopPropagation(); moveViewer(1); }}>›</button>}<p className="viewer-count">{viewerIndex + 1} / {visibleItems.length}</p></div>}
-    {showInfo && <div className="info-overlay" role="dialog" aria-modal="true" aria-label="ご案内" onClick={() => setShowInfo(false)}><section className="info-dialog" onClick={(event) => event.stopPropagation()}><button className="info-close" aria-label="閉じる" onClick={() => setShowInfo(false)}>×</button><p className="eyebrow">Information</p><h2>ご案内</h2><p>画像と動画のご投稿をお願いします。</p><p>お気づきやお問い合わせは以下までお願いします。</p><a href="mailto:sota304560@gmail.com">sota304560@gmail.com</a></section></div>}
+    {showInfo && <div className="info-overlay" role="dialog" aria-modal="true" aria-label="ご案内" onClick={() => setShowInfo(false)}><section className="info-dialog" onClick={(event) => event.stopPropagation()}><button className="info-close" aria-label="閉じる" onClick={() => setShowInfo(false)}>×</button><p className="eyebrow">Information</p><h2>お問い合わせ</h2><p>お気づきやお問い合わせは以下までお願いします。</p><a href="mailto:sota304560@gmail.com">sota304560@gmail.com</a></section></div>}
   </main>;
 }
