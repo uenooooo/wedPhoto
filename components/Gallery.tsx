@@ -139,7 +139,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
       <h1>Sota & Momoka&apos;s<br />Wedding Photo Gallery</h1>
       <p className="lead">結婚式用の写真や動画の共有サイトです。</p>
       <p className="hero-note">画像と動画のご投稿をお願いします。<br />ダウンロードも可能です。</p>
-      <div className="hero-actions"><label className="button">写真・動画を追加<input hidden type="file" accept="image/*,video/*" multiple onChange={onChoose} /></label><button className="info-button" aria-label="サイトのご案内" onClick={() => setShowInfo(true)}>i</button></div>
+      <button className="info-button" aria-label="サイトのご案内" onClick={() => setShowInfo(true)}>i</button><div className="hero-actions"><label className="button">写真・動画を追加<input hidden type="file" accept="image/*,video/*" multiple onChange={onChoose} /></label></div>
     </header>
 
     {uploads.length > 0 && <section className="section"><h2>アップロード</h2><ul className="upload-list">{uploads.map((item) => <li key={item.id}><strong>{item.name}</strong><br /><small>{item.status === "uploading" ? `${Math.round(item.progress * 100)}% アップロード中` : item.error}</small>{item.status === "uploading" && <progress className="progress" value={item.progress} max="1" />}</li>)}</ul></section>}
