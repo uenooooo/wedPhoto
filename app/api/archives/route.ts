@@ -4,10 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { isValidEventKey } from "@/lib/event";
 import { bucket, s3 } from "@/lib/s3";
 
-function archiveUrl(key: string) {
-  return `https://${bucket}.s3.${process.env.AWS_REGION ?? "ap-northeast-1"}.amazonaws.com/${key}`;
-}
-
 export async function GET(request: NextRequest) {
   if (!isValidEventKey(request.nextUrl.searchParams.get("eventKey"))) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const id = request.nextUrl.searchParams.get("id");
@@ -15,7 +11,7 @@ export async function GET(request: NextRequest) {
   const key = `archives/${id}.zip`;
   try {
     await s3().send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
-    return NextResponse.json({ status: "ready", url: archiveUrl(key) });
+    return NextResponse.json({ status: "ready", key });
   } catch {
     return NextResponse.json({ status: "processing" });
   }

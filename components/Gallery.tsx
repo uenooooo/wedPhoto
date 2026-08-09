@@ -93,7 +93,13 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
   };
 
   const toggle = (key: string) => setSelected((current) => current.includes(key) ? current.filter((value) => value !== key) : [...current, key]);
-  const download = (url: string) => window.open(url, "_blank", "noopener,noreferrer");
+  const download = (key: string) => {
+    const link = document.createElement("a");
+    link.href = `/api/download?eventKey=${encodeURIComponent(eventKey)}&key=${encodeURIComponent(key)}`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
   const requestArchive = async (keys: string[]) => {
     setArchiveStatus("ZIPを準備中です…");
     try {
@@ -105,7 +111,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
         const status = await statusResponse.json();
         if (status.status === "ready") {
           setArchiveStatus("ZIPの準備ができました。");
-          download(status.url);
+          download(status.key);
           return;
         }
         window.setTimeout(check, 3000);
@@ -118,7 +124,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
   const downloadSelected = () => {
     const selectedItems = items.filter((item) => selected.includes(item.key));
     if (selectedItems.length >= 20) void requestArchive(selectedItems.map((item) => item.key));
-    else selectedItems.forEach((item) => download(item.url));
+    else selectedItems.forEach((item) => download(item.key));
   };
   const selectedCount = selected.length;
   const finishSelecting = () => { setIsSelecting(false); setSelected([]); };
