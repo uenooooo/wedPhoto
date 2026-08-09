@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, TouchEvent, useEffect, useMemo, useState } from "react";
 
 type Media = { key: string; type: "image" | "video"; createdAt: string; url: string };
 type UploadState = { id: string; name: string; progress: number; status: "uploading" | "error"; error?: string };
@@ -34,6 +34,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
   const [isSelecting, setIsSelecting] = useState(false);
   const [viewing, setViewing] = useState<Media | null>(null);
   const [showInfo, setShowInfo] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [uploads, setUploads] = useState<UploadState[]>([]);
   const [archiveStatus, setArchiveStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -126,6 +127,12 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
     const next = visibleItems[viewerIndex + direction];
     if (next) setViewing(next);
   };
+  const finishSwipe = (event: TouchEvent<HTMLDivElement>) => {
+    if (touchStartX === null) return;
+    const delta = event.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(delta) > 48) moveViewer(delta > 0 ? -1 : 1);
+    setTouchStartX(null);
+  };
 
   return <main className={`page ${isSelecting ? "selecting" : ""}`}>
     <header className="hero">
@@ -145,7 +152,8 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
       {loading ? <p className="empty">読み込み中…</p> : visibleItems.length === 0 ? <p className="empty">まだ写真・動画はありません。</p> : <div className="grid">{visibleItems.map((item) => <button className={`card ${isSelecting && selected.includes(item.key) ? "selected" : ""}`} key={item.key} onClick={() => isSelecting ? toggle(item.key) : setViewing(item)}>{item.type === "image" ? <img src={item.url} alt="結婚式の投稿写真" /> : <><video src={item.url} preload="metadata" muted /><span className="video-badge">VIDEO</span></>}</button>)}</div>}
     </section>
     {isSelecting && <div className="selection-actionbar"><button className="button" disabled={selectedCount === 0} onClick={downloadSelected}>{selectedCount >= 20 ? "ZIPを作成してダウンロード" : "選択した写真・動画をダウンロード"}</button></div>}
-    {viewing && <div className="viewer" role="dialog" aria-modal="true" aria-label="メディアを拡大表示" onClick={() => setViewing(null)}><button className="viewer-close" aria-label="閉じる">×</button>{viewerIndex > 0 && <button className="viewer-nav previous" aria-label="前のメディア" onClick={(event) => { event.stopPropagation(); moveViewer(-1); }}>‹</button>}<div className="viewer-content" onClick={(event) => event.stopPropagation()}>{viewing.type === "image" ? <img src={viewing.url} alt="結婚式の投稿写真" /> : <video src={viewing.url} controls autoPlay />}</div>{viewerIndex < visibleItems.length - 1 && <button className="viewer-nav next" aria-label="次のメディア" onClick={(event) => { event.stopPropagation(); moveViewer(1); }}>›</button>}<p className="viewer-count">{viewerIndex + 1} / {visibleItems.length}</p></div>}
+    {!isSelecting && <label className="floating-upload" aria-label="写真・動画を追加">＋<input hidden type="file" accept="image/*,video/*" multiple onChange={onChoose} /></label>}
+    {viewing && <div className="viewer" role="dialog" aria-modal="true" aria-label="メディアを拡大表示" onClick={() => setViewing(null)} onTouchStart={(event) => setTouchStartX(event.touches[0].clientX)} onTouchEnd={finishSwipe}><button className="viewer-close" aria-label="閉じる">×</button>{viewerIndex > 0 && <button className="viewer-nav previous" aria-label="前のメディア" onClick={(event) => { event.stopPropagation(); moveViewer(-1); }}>‹</button>}<div className="viewer-content" onClick={(event) => event.stopPropagation()}>{viewing.type === "image" ? <img src={viewing.url} alt="結婚式の投稿写真" /> : <video src={viewing.url} controls autoPlay />}</div>{viewerIndex < visibleItems.length - 1 && <button className="viewer-nav next" aria-label="次のメディア" onClick={(event) => { event.stopPropagation(); moveViewer(1); }}>›</button>}<p className="viewer-count">{viewerIndex + 1} / {visibleItems.length}</p></div>}
     {showInfo && <div className="info-overlay" role="dialog" aria-modal="true" aria-label="ご案内" onClick={() => setShowInfo(false)}><section className="info-dialog" onClick={(event) => event.stopPropagation()}><button className="info-close" aria-label="閉じる" onClick={() => setShowInfo(false)}>×</button><p className="eyebrow">Information</p><h2>お問い合わせ</h2><p>お気づきやお問い合わせは以下までお願いします。</p><a href="mailto:sota304560@gmail.com">sota304560@gmail.com</a></section></div>}
   </main>;
 }
