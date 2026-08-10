@@ -24,6 +24,7 @@ export class WeddingStack extends cdk.Stack {
     const convertRole = new iam.Role(this, "MediaConvertRole", { assumedBy: new iam.ServicePrincipal("mediaconvert.amazonaws.com") });
     media.grantRead(convertRole, "uploads/*");
     media.grantPut(convertRole, "ready/*");
+    media.grantPut(convertRole, "thumbnails/*");
 
     const processor = new lambda.DockerImageFunction(this, "Processor", {
       code: lambda.DockerImageCode.fromImageAsset("infra/processor"),
