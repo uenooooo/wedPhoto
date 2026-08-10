@@ -116,7 +116,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
         const statusResponse = await fetch(`/api/archives?eventKey=${encodeURIComponent(eventKey)}&id=${result.id}`);
         const status = await statusResponse.json();
         if (status.status === "ready") {
-          setArchiveStatus("ZIPの準備ができました。");
+          setArchiveStatus(null);
           setIsPreparingArchive(false);
           download(status.key);
           return;
