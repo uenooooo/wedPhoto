@@ -151,8 +151,8 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
   return <main className={`page ${isSelecting ? "selecting" : ""}`}>
     <header className="hero">
       <h1>Sota & Momoka&apos;s<br />Wedding Photo Gallery</h1>
-      <p className="lead">この度はご参加ありがとうございます。<br />結婚式用の写真や動画の共有サイトです。</p>
-      <p className="hero-note">画像と動画のご投稿をお願いします。<br />ダウンロードも可能です。</p>
+      <p className="lead">結婚式用の写真や動画の共有サイトです。</p>
+      <p className="hero-note">この度はご参加ありがとうございます。<br />画像と動画のご投稿をお願いします。<br />ダウンロードも可能です。</p>
       <button className="info-button" aria-label="サイトのご案内" onClick={() => setShowInfo(true)}>i</button><div className="hero-actions"><button className="button" type="button" onClick={() => fileInputRef.current?.click()}>写真・動画を追加</button><input ref={fileInputRef} hidden type="file" accept="image/*,video/*" multiple onChange={onChoose} /></div>
     </header>
 
