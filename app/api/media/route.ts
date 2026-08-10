@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       const url = `https://${bucket}.s3.${process.env.AWS_REGION ?? "ap-northeast-1"}.amazonaws.com/${key.split("/").map(encodeURIComponent).join("/")}`;
       const thumbnailUrl = type === "image"
         ? url.replace("/ready/", "/thumbnails/")
-        : url.replace("/ready/", "/thumbnails/").replace(/_video\.mp4$/, "_thumbnail.0000001.jpg");
+        : url.replace("/ready/", "/thumbnails/").replace(/_video\.mp4$/, "_thumbnail.0000000.jpg");
       return [{ key, type, createdAt: object.LastModified?.toISOString() ?? "", url, thumbnailUrl }];
     });
     items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
