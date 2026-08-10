@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
       const extension = key.split(".").pop()?.toLowerCase() ?? "";
       const type = imageExtensions.has(extension) ? "image" : videoExtensions.has(extension) ? "video" : null;
       if (!type) return [];
-      return [{ key, type, createdAt: object.LastModified?.toISOString() ?? "", url: `https://${bucket}.s3.${process.env.AWS_REGION ?? "ap-northeast-1"}.amazonaws.com/${key.split("/").map(encodeURIComponent).join("/")}` }];
+      const url = `https://${bucket}.s3.${process.env.AWS_REGION ?? "ap-northeast-1"}.amazonaws.com/${key.split("/").map(encodeURIComponent).join("/")}`;
+      return [{ key, type, createdAt: object.LastModified?.toISOString() ?? "", url, thumbnailUrl: type === "image" ? url.replace("/ready/", "/thumbnails/") : undefined }];
     });
     items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return NextResponse.json({ items });

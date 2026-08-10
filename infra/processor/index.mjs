@@ -12,8 +12,12 @@ export const handler = async (event) => {
     const type = object.ContentType ?? "";
     if (type.startsWith("image/")) {
       const source = Buffer.from(await object.Body.transformToByteArray());
-      const output = await sharp(source).rotate().jpeg({ quality: 90 }).withMetadata().toBuffer();
-      await s3.send(new PutObjectCommand({ Bucket: bucket, Key: `ready/${crypto.randomUUID()}.jpg`, Body: output, ContentType: "image/jpeg" }));
+      const id = crypto.randomUUID();
+      const image = sharp(source).rotate();
+      const thumbnail = await image.clone().resize({ width: 600, withoutEnlargement: true }).jpeg({ quality: 78 }).toBuffer();
+      const output = await image.jpeg({ quality: 90 }).withMetadata().toBuffer();
+      await s3.send(new PutObjectCommand({ Bucket: bucket, Key: `thumbnails/${id}.jpg`, Body: thumbnail, ContentType: "image/jpeg" }));
+      await s3.send(new PutObjectCommand({ Bucket: bucket, Key: `ready/${id}.jpg`, Body: output, ContentType: "image/jpeg" }));
       continue;
     }
     if (type.startsWith("video/")) {

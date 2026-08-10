@@ -2,7 +2,7 @@
 
 import { ChangeEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
 
-type Media = { key: string; type: "image" | "video"; createdAt: string; url: string };
+type Media = { key: string; type: "image" | "video"; createdAt: string; url: string; thumbnailUrl?: string };
 type UploadState = { id: string; name: string; progress: number; status: "uploading" | "error"; error?: string };
 const filters = ["all", "image", "video"] as const;
 const labels = { all: "すべて", image: "写真", video: "動画" };
@@ -162,7 +162,7 @@ export default function Gallery({ eventKey }: { eventKey: string }) {
       {isSelecting ? <div className="selection-toolbar"><button onClick={finishSelecting}>キャンセル</button><strong>{selectedCount}件を選択</strong><button onClick={selectAll}>{selectedCount === visibleItems.length ? "選択解除" : "すべて選択"}</button></div> : <div className="toolbar gallery-toolbar"><h2>ギャラリー</h2><div className="gallery-actions"><button className="button subtle refresh-button" onClick={() => void load()} disabled={loading}>{loading ? "更新中…" : "更新"}</button><button className="button subtle" onClick={() => setIsSelecting(true)}>ダウンロード選択</button></div></div>}
       {archiveStatus && <p aria-live="polite">{archiveStatus}</p>}
       <div className="filters">{filters.map((value) => <button key={value} className={`filter ${filter === value ? "active" : ""}`} onClick={() => setFilter(value)}>{labels[value]}</button>)}</div>
-      {loading ? <p className="empty">読み込み中…</p> : visibleItems.length === 0 ? <p className="empty">まだ写真・動画はありません。</p> : <div className="grid">{visibleItems.map((item) => <button className={`card ${isSelecting && selected.includes(item.key) ? "selected" : ""}`} key={item.key} onClick={() => isSelecting ? toggle(item.key) : setViewing(item)}>{item.type === "image" ? <img src={item.url} alt="結婚式の投稿写真" /> : <><video src={item.url} preload="metadata" muted /><span className="video-badge">VIDEO</span></>}</button>)}</div>}
+      {loading ? <p className="empty">読み込み中…</p> : visibleItems.length === 0 ? <p className="empty">まだ写真・動画はありません。</p> : <div className="grid">{visibleItems.map((item) => <button className={`card ${isSelecting && selected.includes(item.key) ? "selected" : ""}`} key={item.key} onClick={() => isSelecting ? toggle(item.key) : setViewing(item)}>{item.type === "image" ? <img src={item.thumbnailUrl ?? item.url} loading="lazy" alt="結婚式の投稿写真" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = item.url; }} /> : <><video src={item.url} preload="none" muted /><span className="video-badge">VIDEO</span></>}</button>)}</div>}
     </section>
     {isSelecting && <div className="selection-actionbar"><button className="button" disabled={selectedCount === 0 || isPreparingArchive} onClick={downloadSelected}>{isPreparingArchive ? "ZIPを準備中…" : selectedCount >= 2 ? "ZIPを作成してダウンロード" : "ダウンロード"}</button></div>}
     {isPreparingArchive && <div className="archive-overlay" role="status" aria-live="polite"><div className="archive-dialog"><span className="archive-spinner" /><strong>ZIPを準備中です</strong><p>通常は30秒〜1分です。<br />動画や大量の写真は数分かかる場合があります。</p><small>準備ができ次第、自動でダウンロードします。<br />この画面を閉じずにお待ちください。</small></div></div>}

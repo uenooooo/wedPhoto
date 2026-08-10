@@ -19,7 +19,7 @@ export class WeddingStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       autoDeleteObjects: false,
     });
-    media.addToResourcePolicy(new iam.PolicyStatement({ actions: ["s3:GetObject"], principals: [new iam.AnyPrincipal()], resources: [media.arnForObjects("ready/*"), media.arnForObjects("archives/*")] }));
+    media.addToResourcePolicy(new iam.PolicyStatement({ actions: ["s3:GetObject"], principals: [new iam.AnyPrincipal()], resources: [media.arnForObjects("ready/*"), media.arnForObjects("thumbnails/*"), media.arnForObjects("archives/*")] }));
 
     const convertRole = new iam.Role(this, "MediaConvertRole", { assumedBy: new iam.ServicePrincipal("mediaconvert.amazonaws.com") });
     media.grantRead(convertRole, "uploads/*");
@@ -34,6 +34,7 @@ export class WeddingStack extends cdk.Stack {
     });
     media.grantRead(processor, "uploads/*");
     media.grantPut(processor, "ready/*");
+    media.grantPut(processor, "thumbnails/*");
     processor.addToRolePolicy(new iam.PolicyStatement({ actions: ["mediaconvert:CreateJob"], resources: ["*"] }));
     processor.addToRolePolicy(new iam.PolicyStatement({ actions: ["iam:PassRole"], resources: [convertRole.roleArn] }));
     media.addEventNotification(s3.EventType.OBJECT_CREATED, new s3n.LambdaDestination(processor), { prefix: "uploads/" });
@@ -48,7 +49,7 @@ export class WeddingStack extends cdk.Stack {
 
     const appUser = new iam.User(this, "VercelAppUser");
     appUser.addToPolicy(new iam.PolicyStatement({ actions: ["s3:ListBucket"], resources: [media.bucketArn] }));
-    appUser.addToPolicy(new iam.PolicyStatement({ actions: ["s3:GetObject", "s3:PutObject", "s3:AbortMultipartUpload", "s3:ListMultipartUploadParts"], resources: [media.arnForObjects("uploads/*"), media.arnForObjects("ready/*"), media.arnForObjects("archives/*")] }));
+    appUser.addToPolicy(new iam.PolicyStatement({ actions: ["s3:GetObject", "s3:PutObject", "s3:AbortMultipartUpload", "s3:ListMultipartUploadParts"], resources: [media.arnForObjects("uploads/*"), media.arnForObjects("ready/*"), media.arnForObjects("thumbnails/*"), media.arnForObjects("archives/*")] }));
     appUser.addToPolicy(new iam.PolicyStatement({ actions: ["ecs:RunTask"], resources: [task.taskDefinitionArn] }));
     appUser.addToPolicy(new iam.PolicyStatement({ actions: ["iam:PassRole"], resources: [task.executionRole!.roleArn, task.taskRole.roleArn] }));
 
