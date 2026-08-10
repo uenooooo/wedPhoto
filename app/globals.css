@@ -28,7 +28,7 @@ h2 { font-size: 28px; margin: 5px 0; }
 .gallery-section { padding: clamp(20px, 4vw, 38px); border-radius: 24px; background: rgba(255, 255, 255, .72); box-shadow: 0 12px 35px rgba(78, 58, 55, .06); }
 .toolbar { justify-content: space-between; margin-bottom: 18px; }
 .gallery-toolbar { justify-content: space-between; margin-bottom: 10px; }
-.gallery-actions { display: flex; align-items: center; gap: 10px; }.refresh-button { border: 0; padding: 9px 6px; color: #79504a; background: transparent; cursor: pointer; font-weight: 700; }.refresh-button:disabled { opacity: .55; }
+.gallery-actions { display: flex; align-items: center; gap: 10px; }.refresh-button { padding: 9px 13px; }.refresh-button:disabled { opacity: .55; }
 .selection-toolbar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; min-height: 48px; margin: -6px 0 18px; }
 .selection-toolbar button { border: 0; padding: 10px 0; color: #8a5e59; background: transparent; font-weight: 700; cursor: pointer; }.selection-toolbar button:last-child { text-align: right; }
 .selection-toolbar strong { font-size: 15px; text-align: center; }
